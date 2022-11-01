@@ -1,27 +1,25 @@
 from telethon import TelegramClient
+import BOT_INFO
 
-API_ID = 123456
-API_HASH = '123456qwerty123456'
-users = [
-    'user1',
-    'user2',
-    'user3'
-]
+API_ID = BOT_INFO.API_ID  # вида: 12345678
+API_HASH = BOT_INFO.API_HASH  # вида: '12345q1wer23t51q123.....'
 
 
-class Mailing:
-    def __init__(self):
-        self.API_ID = 123456
-        self.API_HASH = '123456qwerty123456'
-        self.message_default_body = '/СГЕНЕРИРОВАНО АВТОМАТИЧЕСКИ/'
-        self.message = ''
+def sender(message, to_all_users=False):
+    """
+    Функция, доставляет нужное сообщение вашим контактам.
+    Если to_all_users = False, то сообщение отправится только тем контактам,
+    которые находятся в списке "согласились на рассылку"
+    """
+
+    if to_all_users:
+        users = BOT_INFO.users_all
+    else:
+        users = BOT_INFO.users_mailing
+
+    with TelegramClient('anon', API_ID, API_HASH) as client:
+        for user in users:
+            client.loop.run_until_complete(client.send_message(user, message))
 
 
-with TelegramClient('anon', API_ID, API_HASH) as client:
-    # Первый параметр - это имя файла.session (появляется в каталоге проекта)
-    for user in users:
-        client.loop.run_until_complete(client.send_message(user,
-                                                           '/CГЕНЕРИРОВАНО АВТОМАТИЧЕСКИ/ \n'
-                                                           '/ГАЛАКТИЧЕСКИМ ВОЙСКОМ/ \n'
-                                                           'ЛЮДИ!!! \n'
-                                                           'Вам. Всем. Конец!'))
+sender(message='маленький тест', to_all_users=True)
